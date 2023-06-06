@@ -1,0 +1,7 @@
+.internal-linking {
+    border: 1px solid #ddd;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
