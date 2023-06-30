@@ -11,6 +11,7 @@ add_action('the_content', 'internal_linking');
 add_action('activated_plugin', 'internal_linking_activate');
 
 add_action('wp_enqueue_scripts', 'internal_linking_enqueue_scripts');
+add_action('admin_enqueue_scripts', 'internal_linking_enqueue_scripts');
 
 function internal_linking_enqueue_scripts() {
     wp_enqueue_style( 'seo-plugin-style', plugin_dir_url( __FILE__ ).'style.css' );
@@ -37,24 +38,29 @@ function internal_linking($content) {
 
     if($response['headers']['content-type'] != 'application/json') {
         if(is_user_logged_in()) {
-            $content .= "<div class='internal-linking-broken'> Impossible de générer votre maillage interne, votre clef d'API est invalide :( </div>";
+            $content .= "<div class='internal-linking-broken'> Impossible de générer votre maillage interne, votre clef d'API est invalide </div>";
         }
         return $content;
     }
 
     $top_10_links = json_decode($response['body'], true);
     if(count($top_10_links) == 0) {
-        $content .= "<div class='internal-linking'> Cette page est toute seule :( </div>";
+        $content .= "<div class='internal-linking'> Aucune suggestion. </div>";
         return $content;
     }
 
     $link_div = "";
     foreach($top_10_links as $link) {
-        $link_div .= "<li> <a href='".$link['similar']."'>".$link['metrics']['original']['title'].'</a> </li>';
+        $link_div .= "<li>";
+        $link_div .= "<a href='".$link['similar']."'>".$link['metrics']['original']['title'].'</a>';
+        $grade = floor($link['score'] * 100);
+        $link_div .= "<small> Similitude : $grade % </small>";
+        $link_div .= '</li>';
+        $link_div .= "<script>console.log(".json_encode($link).")</script>";
     }  
      $content .= <<<HTML
         <ul class="internal-linking">
-            Cette page vous passionne ? Ces liens pourraient vous intéresser :) 
+            Cette page vous passionne ? Ces liens pourraient vous intéresser :
             $link_div
         </ul>
      HTML;

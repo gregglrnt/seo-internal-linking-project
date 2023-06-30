@@ -5,3 +5,10 @@
     flex-direction: column;
     list-style-type: none;
 }
+
+.internal-linking-admin form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 30%;
+}
